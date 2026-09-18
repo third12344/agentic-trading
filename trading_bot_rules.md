@@ -8,9 +8,10 @@
 
 ## 1. Account and regulatory facts
 
-- Paper account starting balance: **$500**. Treat it as a **cash account** (no margin, no borrowed money). Simulate settlement: proceeds from a sale are not reusable until the next business day.
+- Paper account starting balance: **$500**, confirmed live against the linked account (••••3771) on 2026-09-18: `cash` = $500, `buying_power` = `unleveraged_buying_power` = $500 (no margin drawn).
+- **Cash account only, always. Never margin, regardless of what the linked account technically permits.** The linked Robinhood account (••••3771) is a `limited_margin` account type, but by owner instruction it must always be treated and traded as a pure cash account: never use margin or borrowed buying power, and always size and calculate buying power off `unleveraged_buying_power` (from `get_portfolio`), never the raw `buying_power` figure if the two ever diverge. Simulate settlement: proceeds from a sale are not reusable until the next business day.
 - Stocks and ETFs only. No options, crypto, or leveraged/inverse ETFs.
-- Pattern day trader note: the FINRA PDT day-trade count and $25,000 minimum were eliminated effective June 4, 2026 (brokers have until Oct 20, 2027 to implement). PDT applied to margin accounts; in a cash account the binding constraint is settlement (avoid good-faith violations). Before going live, the owner will confirm Robinhood's current handling.
+- Pattern day trader note: the FINRA PDT day-trade count and $25,000 minimum were eliminated effective June 4, 2026 (brokers have until Oct 20, 2027 to implement). PDT applied to margin accounts; since this account is always traded cash-only, the binding constraint is settlement (avoid good-faith violations). Before going live, the owner will confirm Robinhood's current handling.
 
 ## 2. Position sizing and risk limits
 
