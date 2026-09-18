@@ -54,6 +54,13 @@ Rescanned market-wide (not just crypto/tokenization names) for relative volume >
 
 **Next check:** ~40 min.
 
+### 2026-09-18, ~14:37 ET (regular session, +45 min)
+GEMI now +25.5% (still the only name over 1.8x relative volume, still way past the cap). MARA has pushed further to +13.4% — also more extended, not resetting. Rechecked RIOT (~0.96x avg pace), CLSK (~1.20x), CIFR (~0.81x) — none have closed the volume gap; if anything CIFR's relative pace has drifted down. No trade.
+
+We're now ~53 minutes from the §7 cutoff (no new entries in the last 30 min before close, i.e. after 3:30 PM ET) with nothing qualifying all day. One more check planned before that window closes; if nothing changes, today ends as a no-trade day — every candidate either lacked a genuine catalyst, failed spread, failed volume confirmation, was priced out of the $100 cap, or became too extended by the time it cleared other filters.
+
+**Next check:** ~35-40 min (near the 3:30 PM ET no-new-entry cutoff).
+
 **Next check:** ~35 min.
 
 ## Trade log
