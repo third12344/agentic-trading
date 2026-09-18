@@ -61,6 +61,19 @@ We're now ~53 minutes from the §7 cutoff (no new entries in the last 30 min bef
 
 **Next check:** ~35-40 min (near the 3:30 PM ET no-new-entry cutoff).
 
+### 2026-09-18, ~15:20 ET (10 min before the §7 no-new-entry cutoff)
+Final look before new entries close for the day: GEMI +29.3% (only name over 1.8x relative volume, now further extended than ever), MARA +13.6%. No change in the picture. With ~10 minutes left and no qualifying setup, calling it here rather than rushing a checklist in the final minutes.
+
+## End-of-day summary — 2026-09-18
+**No trade taken.** A genuine, valid catalyst was in play all day (SEC's five-year "Innovation Exemption" for tokenized-stock trading + a related CFTC no-action position, both primary-source and reported before the open), and it produced a real sector-wide move across crypto-linked and tokenization-adjacent equities. But every candidate that reached a technical trigger was disqualified by another rule before a trade could be logged:
+- **HOOD / COIN** — the most directly-named beneficiaries, clean breakouts, but priced out of the $100 position cap (§2/§6) even for 1 whole share.
+- **MARA** — cleared volume and broke out twice, but was either mid-fade at the moment of confirmation or, once durably broken out, already past the §5 10% overextension cap by the time it was confirmed. Ended the day +13.6%.
+- **SECZ** — the best-matched catalyst of the day (tokenization is its entire business, plus a fresh analyst PT raise) but its spread stayed at 2-2.5x the §4 cap all day.
+- **CRCL, RIOT, CLSK, CIFR** — reasonable price action and, for CRCL, an eventually-tight spread, but none ever cleared the §4 >2x relative-volume bar.
+- **GEMI** — the only name with strong relative volume (up to ~3.9x) all afternoon, but it ran to +29% and was disqualified by the extension cap almost the entire time it was on the radar.
+
+No open position exists, so there's nothing to flatten at the close. This was a day where the rules did their job: a real catalyst without a clean, compliant setup is exactly the case they're designed to sit out rather than force.
+
 **Next check:** ~35 min.
 
 ## Trade log
