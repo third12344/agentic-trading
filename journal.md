@@ -42,6 +42,13 @@ MARA is now close to being fully disqualified for the rest of the day once it cr
 
 **Next check:** ~35 min. Watching for volume to actually confirm on one of these names, since price alone isn't enough.
 
+### 2026-09-18, ~13:10 ET (regular session, +38 min)
+Re-ran the scan with an explicit relative-volume filter (>1.8x) across the whole $5-$100 universe: **only GEMI (Gemini Space Station) cleared it** (2.27x) — but GEMI is +18.2% on the day, far past the §5 10% extension cap. Nothing else in the tokenization/crypto sector is showing real volume conviction this afternoon: CIFR still ~0.86x avg pace, RIOT ~0.99x, CLSK ~1.31x. **CRCL's spread finally tightened (0.07%)**, but checking its relative volume properly this time shows it's only ~1.16-1.2x avg pace — also fails §4, so it was never a valid trigger even when the spread looked fine. SECZ's spread is still wide (0.41%).
+
+**Takeaway:** this morning's catalyst produced a real sector-wide price move, but by early afternoon the volume follow-through just isn't there except in the two names that already ran too far (MARA, GEMI) or the two that are too expensive for the $100 cap (HOOD, COIN). The rules are correctly filtering out weak setups rather than finding an excuse to force a trade. No trade today so far.
+
+**Next check:** ~40 min (slowing cadence slightly — the morning catalyst's easy opportunities look to have passed; watching for a fresh afternoon catalyst or a genuine volume spike instead).
+
 **Next check:** ~35 min.
 
 ## Trade log
