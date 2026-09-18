@@ -49,6 +49,11 @@ Re-ran the scan with an explicit relative-volume filter (>1.8x) across the whole
 
 **Next check:** ~40 min (slowing cadence slightly — the morning catalyst's easy opportunities look to have passed; watching for a fresh afternoon catalyst or a genuine volume spike instead).
 
+### 2026-09-18, ~13:52 ET (regular session, +42 min)
+Rescanned market-wide (not just crypto/tokenization names) for relative volume >1.8x: **still only GEMI**, now +22.9% (further past the extension cap). Checked the earnings calendar for anything reporting today — only micro-caps (BLSM, CLGN, BRTX) that would fail the market-cap/price universe filters regardless. No fresh catalyst, no qualifying volume anywhere else in the market right now. No trade.
+
+**Next check:** ~40 min.
+
 **Next check:** ~35 min.
 
 ## Trade log
