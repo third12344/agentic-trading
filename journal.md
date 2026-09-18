@@ -30,6 +30,13 @@ Re-screened. **MARA:** unchanged — still rangebound $12.42-12.72, hasn't recla
 
 **Next check:** watch for MARA to confirm above $12.72 with volume, or spreads on SECZ/CRCL to tighten.
 
+### 2026-09-18, ~11:52 ET (regular session, +36 min)
+**MARA confirmed the breakout** at 11:20-11:25 ET: traded through $12.72 to a high of $12.75 on the day's strongest 5-min volume (672K then 858K shares) — a clean, valid trigger (reached checklist item 3). But by the time this check ran, price had spent ~30 min consolidating $12.61-12.75 rather than continuing, and now sits at $12.71-12.72 — **+9.2-9.3% from yesterday's close ($11.64)**, right at the edge of the §5 "skip if already run >10%" guardrail. Entering here would mean chasing a move that's already 30 minutes stale with very little room left before hitting that extension ceiling, so reward:risk no longer clears the 2:1 bar cleanly. Skipped — reached item 3, but too extended/late for a fresh entry by the time it was confirmed. **SECZ** spread still wide (0.50%). **CRCL** spread improved slightly but still borderline-over (0.23%). No trade.
+
+MARA is now close to being fully disqualified for the rest of the day once it crosses +10% ($12.80); watching for a pullback/reset instead, or a fresh name.
+
+**Next check:** ~35 min.
+
 ## Trade log
 
 _(No trades yet.)_
