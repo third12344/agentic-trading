@@ -20,6 +20,11 @@ RIOT and CLSK were also checked and showed only choppy, range-bound action (no c
 
 **Next check:** watch MARA/RIOT/CLSK/IREN for a fresh reclaim of today's highs on volume, or another catalyst-tied name that fits the $100 cap.
 
+### 2026-09-18, ~10:38 ET (regular session, +35 min)
+Re-screened. **MARA:** unchanged — still rangebound $12.42-12.72, hasn't reclaimed its earlier high; no fresh trigger. **SECZ (Securitize Corp)** stood out: a much more directly-tied catalyst surfaced — a fresh StoneX analyst note today (Buy maintained, PT raised $10→$12, a valid §3 catalyst on its own) plus Securitize's core business (tokenized real-world-asset infrastructure) is named directly in wire coverage of the SEC tokenization exemption. Relative volume was strong (~7.6x pace). But live order book showed bid $9.88 / ask $9.92 — a 0.40% spread, double the §4 cap of 0.2% — so it fails checklist item 2 before reaching a trigger. Skipped, not logged as a step-3 setup (never got past universe filters). **CRCL:** did have a genuine second-leg breakout (opening-range high $90.16 → thrust to $92.55 on above-average volume) and has since pulled back to ~$91.4-91.5. But that pullback sits well above VWAP ($90.42, +1.1%) rather than at it, and the only nearby support is the last 5-min bar's low — not a clean match for either of §5's listed triggers (opening-range breakout hold vs. VWAP reclaim). Passed on it rather than manufacture a trigger. No trade this round.
+
+**Next check:** ~35 min. Watch for CRCL to either pull back to VWAP and hold, or SECZ's spread to tighten under 0.2%, or a fresh breakout elsewhere.
+
 ## Trade log
 
 _(No trades yet.)_
