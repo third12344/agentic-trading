@@ -37,6 +37,13 @@ MARA is now close to being fully disqualified for the rest of the day once it cr
 
 **Next check:** ~35 min.
 
+### 2026-09-18, ~12:32 ET (regular session, +40 min)
+**MARA** crossed +10% (+11.1%, $12.93) — fully disqualified for new entries per §5 for the rest of the day. Looked at **CIFR (Cipher Digital)**, another sector name: gapped up at open, sold off to $17.05 by ~10:15 ET, then has climbed steadily back (higher lows all session) to $17.90 — only +5.7% from prior close, plenty of room under the extension cap, spread fine (0.06%). But its volume today (16.6M, ~47% of the session elapsed) paces to only ~0.9x its 39M average — the move so far lacks real participation, failing §4's >2x relative-volume requirement. Checked **RIOT** (paces to ~1.1x avg) and **CLSK** (~1.45x avg) too — both also short of the 2x bar. None reached checklist item 3. **SECZ**/**CRCL** still fail spread. No trade.
+
+**Next check:** ~35 min. Watching for volume to actually confirm on one of these names, since price alone isn't enough.
+
+**Next check:** ~35 min.
+
 ## Trade log
 
 _(No trades yet.)_
