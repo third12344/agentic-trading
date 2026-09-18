@@ -25,6 +25,11 @@ Re-screened. **MARA:** unchanged — still rangebound $12.42-12.72, hasn't recla
 
 **Next check:** ~35 min. Watch for CRCL to either pull back to VWAP and hold, or SECZ's spread to tighten under 0.2%, or a fresh breakout elsewhere.
 
+### 2026-09-18, ~11:16 ET (regular session, +37 min)
+**MARA** has been grinding higher in a tightening range for the last 45 min ($12.42-12.68), testing but not yet confirming a break of the day's high ($12.719-12.72) — currently $12.675/12.68. Given the last session's lesson (chased a breakout that faded before entry), waiting for a confirmed close/trade above $12.72 on volume rather than entering into resistance. **SECZ** spread widened further (0.50%) — still disqualified. **CRCL** spread also widened (0.33%) — still fails §4. No trade this round; nothing new reached checklist item 3 that wasn't already logged.
+
+**Next check:** watch for MARA to confirm above $12.72 with volume, or spreads on SECZ/CRCL to tighten.
+
 ## Trade log
 
 _(No trades yet.)_
