@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Impact Company — Job Calendar</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<header class="topbar">
+  <h1>The Impact Company <span>Job Calendar</span></h1>
+  <div class="sync-info" id="syncInfo">Loading…</div>
+</header>
+
+<nav class="tabs">
+  <button class="tab active" data-tab="calendar">Calendar</button>
+  <button class="tab" data-tab="unassigned">Unassigned Work <span class="badge" id="unassignedCount"></span></button>
+</nav>
+
+<section class="filters">
+  <div class="filter-group">
+    <label>Technician</label>
+    <div class="multiselect" id="techFilter"></div>
+  </div>
+  <div class="filter-group">
+    <label>Project Type</label>
+    <div class="multiselect" id="typeFilter"></div>
+  </div>
+  <button id="clearFilters" class="clear-btn">Clear filters</button>
+</section>
+
+<main>
+  <section id="calendarView" class="view">
+    <div class="month-nav">
+      <button id="prevMonth">&larr;</button>
+      <h2 id="monthLabel"></h2>
+      <button id="nextMonth">&rarr;</button>
+    </div>
+    <div class="calendar-grid" id="calendarGrid"></div>
+  </section>
+
+  <section id="unassignedView" class="view hidden">
+    <table class="unassigned-table">
+      <thead>
+        <tr>
+          <th>Project</th>
+          <th>Project Type</th>
+          <th>Store #</th>
+          <th>Location</th>
+          <th>Date Added</th>
+        </tr>
+      </thead>
+      <tbody id="unassignedBody"></tbody>
+    </table>
+    <p id="unassignedEmpty" class="empty-note hidden">Nothing waiting on assignment right now.</p>
+  </section>
+</main>
+
+<div id="jobModal" class="modal hidden">
+  <div class="modal-card">
+    <button class="modal-close" id="modalClose">&times;</button>
+    <h3 id="modalProject"></h3>
+    <dl>
+      <dt>Technician</dt><dd id="modalTech"></dd>
+      <dt>Project Type</dt><dd id="modalType"></dd>
+      <dt>Store #</dt><dd id="modalStore"></dd>
+      <dt>Location</dt><dd id="modalLocation"></dd>
+      <dt>Date</dt><dd id="modalDate"></dd>
+      <dt>Time Assigned</dt><dd id="modalTime"></dd>
+      <dt>Time Projection</dt><dd id="modalProjection"></dd>
+    </dl>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
