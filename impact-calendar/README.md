@@ -10,16 +10,43 @@ add/update/delete row methods are never imported.
 
 ## What it does
 
-- Pulls rows from one Smartsheet sheet on a timer (default every 15 min).
-- Ignores anything scheduled/added before `START_DATE` (default
-  2026-09-20), so the thousands of older rows in the sheet are never loaded.
-- Splits rows into:
-  - **Assigned** (has both a technician and a date) → shown on the calendar.
-  - **Unassigned** (missing technician and/or date) → shown on the
-    Unassigned Work tab.
+This is wired to **"Scheduling - The Impact Company"** (sheet ID
+`2675304775870340`), read via the Smartsheet connector to confirm the real
+column layout:
+
+| Our field | Smartsheet column |
+|---|---|
+| Store number | `NSN` |
+| Project | computed: `Project Type` — `Store <NSN>` |
+| Project type | `Project Type` |
+| Technician | `Lead Assigned` |
+| Location | `Address` + `City` + `State` + `Zip Code`, combined |
+| Date | `Project Date` |
+| Time assigned | `Time` |
+| Time projection | `Estimated Hours On Site` |
+
+- Pulls rows from the sheet on a timer (default every 15 min).
+- A row is dropped entirely if `Status` is `Cancelled`, `Duplicate`, or
+  `Move to Back Up File` — those aren't real pending work.
+- A row with a real `Project Date` before `START_DATE` (default
+  2026-09-20) is dropped as old backlog — the sheet has ~3,000 historical
+  rows this keeps out. A row with no date yet (blank, or free text like
+  `"first available"`) is always kept, since that's exactly the kind of
+  still-needs-scheduling work the Unassigned tab is for.
+- Splits the remaining rows into:
+  - **Assigned** (has both `Lead Assigned` and a real `Project Date`) →
+    shown on the calendar.
+  - **Unassigned** (missing either) → shown on the Unassigned Work tab,
+    along with which of the two (technician/date) is missing.
 - Calendar shows, per job, at a glance: time assigned, technician, store #,
   and (on click) location, project, and time projection.
-- Filterable by technician and by project type (multi-select chips).
+- Filterable by technician (`Lead Assigned`'s real names) and by project
+  type (`Project Type`'s real picklist values).
+
+If you ever point this at a different sheet, or Impact Company's sheet
+structure changes, edit `src/columnMapping.js` — it's a plain alias list,
+matched case-insensitively against column titles, so adding a new header
+name doesn't require touching any other code.
 
 ## 1. Get Smartsheet API access
 
@@ -29,8 +56,6 @@ add/update/delete row methods are never imported.
    level — this is a real enforcement layer, not just app-level discipline.
 2. Log in as that account, go to **Account > Apps & Integrations > API
    Access**, and generate a new access token.
-3. Get the sheet's numeric ID: open the sheet, **File/Sheet menu >
-   Properties**.
 
 ## 2. Configure
 
@@ -38,14 +63,8 @@ add/update/delete row methods are never imported.
 cp .env.example .env
 ```
 
-Fill in `SMARTSHEET_API_TOKEN` and `SMARTSHEET_SHEET_ID`. Adjust
-`START_DATE` if needed.
-
-Open `src/columnMapping.js` and check the alias lists against your sheet's
-actual column headers. The defaults cover common naming (`Technician`,
-`Project Type`, `Store #`, `Location`, `Date`, `Time`, `Time Projection`,
-`Project`), but if your sheet uses different headers, just add them to the
-matching alias array — no other code needs to change.
+Fill in `SMARTSHEET_API_TOKEN` (the sheet ID and start date are already
+filled in). Adjust `START_DATE` if you want a different cutoff.
 
 ## 3. Run
 
@@ -65,21 +84,13 @@ npm run dev
 
 ## Connecting Smartsheet to Claude (separate from this app)
 
-This app talks to Smartsheet directly via the API token above — it doesn't
-need Claude at runtime. Separately, if you also want Claude (in chat) to be
-able to look at this Smartsheet directly — e.g. to help debug the column
-mapping, or answer ad hoc questions about the sheet — connect the
-Smartsheet connector to your claude.ai account:
-
-1. Go to claude.ai → Settings → Connectors.
-2. Find **Smartsheet** and connect it, authorizing with the account you
-   want Claude to see the sheet as (a Viewer-only account, for the same
-   read-only reasoning as above).
-3. Enable it for this chat if prompted.
-
-Once connected, tell Claude the sheet name and it can inspect the real
-column headers directly, which is the fastest way to finalize
-`columnMapping.js`.
+This app talks to Smartsheet directly via the API token above at runtime —
+it doesn't need the Claude connector to function. The Claude-side
+Smartsheet connector (claude.ai → Settings → Connectors) is already
+connected on this account and was used to read the real column layout
+above directly from the sheet, without needing an API token for that step.
+It's handy going forward for ad hoc questions about the sheet in chat, or
+for re-checking the schema if Impact Company's sheet columns change.
 
 ## Deploying
 

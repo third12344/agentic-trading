@@ -145,13 +145,15 @@ function renderUnassigned(jobs) {
   body.innerHTML = '';
   $('unassignedEmpty').classList.toggle('hidden', jobs.length > 0);
   for (const j of jobs) {
+    const missing = [!j.technician && 'technician', !j.date && 'date'].filter(Boolean).join(', ');
     const row = document.createElement('tr');
     row.innerHTML = `
       <td>${j.project}</td>
       <td>${j.projectType}</td>
       <td>${j.storeNumber}</td>
       <td>${j.location}</td>
-      <td>${j.dateAdded || ''}</td>
+      <td>${j.status || ''}</td>
+      <td>${missing}</td>
     `;
     body.appendChild(row);
   }
