@@ -1,0 +1,420 @@
+<title>Money Flow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: one phone-first column — summary, flow chart, add/edit form, ledger. */
+:root {
+  --bg: #f3f4f1;
+  --surface: #ffffff;
+  --ink: #1b1d1a;
+  --muted: #6c706a;
+  --line: #e2e4de;
+  --accent: #2f6b4f;
+  --good: #2f7d4f;
+  --bad: #b2452f;
+  --halo: #ffffff;
+  --link-op: .38;
+  --font-ui: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-data: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  /* flow colors */
+  --c-income: #2e6e48; --c-income2: #4f9a62; --c-income3: #7cb88a; --c-total: #a7d77a; --c-spent: #8cc7ee;
+  --c-savings: #b03aa6; --c-household: #8a7cf0; --c-dining: #e6a463; --c-shopping: #ec8a6a;
+  --c-travel: #5b7fa8; --c-auto: #b4664f; --c-fun: #2fb6d1; --c-health: #d986c9; --c-edu: #2f8d78;
+  --c-other: #9aa29a; --c-deficit: #c9705a;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121412; --surface: #1b1e1b; --ink: #ebede8; --muted: #9ca199; --line: #2c302b;
+    --accent: #7fc79c; --good: #79c890; --bad: #ef8c76; --halo: #1b1e1b; --link-op: .45;
+    --c-income: #4f9a6c; --c-total: #8fc26a; --c-spent: #6fb2dd; --c-savings: #d266c8;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121412; --surface: #1b1e1b; --ink: #ebede8; --muted: #9ca199; --line: #2c302b;
+  --accent: #7fc79c; --good: #79c890; --bad: #ef8c76; --halo: #1b1e1b; --link-op: .45;
+  --c-income: #4f9a6c; --c-total: #8fc26a; --c-spent: #6fb2dd; --c-savings: #d266c8;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-ui); font-size: 15px; line-height: 1.45; }
+.wrap { max-width: 760px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 48px; display: grid; gap: 16px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 18px; min-width: 0; }
+.eyebrow { font-family: var(--font-data); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0; }
+h1 { font-size: 22px; font-weight: 600; margin: 4px 0 0; text-wrap: balance; }
+h2 { font-size: 17px; font-weight: 600; margin: 0; }
+.sub { color: var(--muted); margin: 0; font-size: 14px; }
+.head { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 3px; gap: 2px; flex-wrap: wrap; }
+.seg button { border: 0; background: transparent; color: var(--muted); font: 500 13px var(--font-ui); padding: 6px 11px; border-radius: 999px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; margin-top: 16px; }
+.stat { border-top: 1px solid var(--line); padding-top: 8px; min-width: 0; }
+.stat b { display: block; font-family: var(--font-data); font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.stat span { font-size: 12px; color: var(--muted); }
+.pos { color: var(--good); } .neg { color: var(--bad); }
+.chart { overflow-x: auto; margin-top: 8px; }
+.chart svg { display: block; width: 100%; min-width: 340px; height: auto; }
+.chart text { font-family: var(--font-data); fill: var(--ink); paint-order: stroke; stroke: var(--halo); stroke-width: 3px; stroke-linejoin: round; }
+.chart .lbl { font-size: 8.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.chart .amt { font-size: 9.5px; fill: var(--muted); }
+.chart path.flow { transition: opacity .15s; }
+.chart g.node { cursor: default; }
+.empty { text-align: center; padding: 40px 12px; color: var(--muted); }
+.banner { display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; background: color-mix(in srgb, var(--c-dining) 18%, var(--surface)); border: 1px solid color-mix(in srgb, var(--c-dining) 45%, var(--line)); border-radius: 14px; padding: 10px 14px; font-size: 14px; }
+form { display: grid; gap: 12px; margin-top: 12px; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); min-width: 0; }
+input, select { font: 15px var(--font-ui); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px; width: 100%; min-width: 0; }
+input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.check { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--ink); }
+.check input { width: 18px; height: 18px; }
+.btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn { font: 600 14px var(--font-ui); border-radius: 10px; padding: 10px 16px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+.btn.primary { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+.btn.danger { color: var(--bad); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.kind .seg { width: 100%; display: grid; grid-template-columns: 1fr 1fr; }
+.list { display: grid; margin-top: 8px; }
+.month { font-family: var(--font-data); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); padding: 14px 0 6px; display: flex; justify-content: space-between; }
+.item { display: grid; grid-template-columns: 10px minmax(0,1fr) auto; gap: 10px; align-items: center; padding: 10px 4px; border-top: 1px solid var(--line); cursor: pointer; background: none; border-left: 0; border-right: 0; border-bottom: 0; text-align: left; color: inherit; font: inherit; width: 100%; }
+.item:hover { background: color-mix(in srgb, var(--ink) 4%, transparent); }
+.dot { width: 10px; height: 10px; border-radius: 50%; }
+.item .t { min-width: 0; }
+.item .t b { font-weight: 500; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.item .t small { color: var(--muted); font-size: 12px; }
+.item .a { font-family: var(--font-data); font-variant-numeric: tabular-nums; font-size: 14px; }
+.pill { font-family: var(--font-data); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; border: 1px solid var(--line); border-radius: 999px; padding: 1px 6px; margin-left: 6px; color: var(--muted); }
+.status { font-size: 13px; color: var(--muted); min-height: 1.2em; }
+@media (max-width: 420px) { .row { grid-template-columns: 1fr; } .stat b { font-size: 14px; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <div id="exampleBanner" class="banner" hidden>
+    <span>You're looking at example entries. Clear them, then add your own.</span>
+    <button class="btn" id="clearExamples" type="button">Clear examples</button>
+  </div>
+
+  <section class="card" aria-labelledby="flowTitle">
+    <div class="head">
+      <div>
+        <p class="eyebrow">Money flow</p>
+        <h1 id="flowTitle">Last 6 months</h1>
+        <p class="sub" id="rangeLabel">&nbsp;</p>
+      </div>
+      <div class="seg" role="group" aria-label="Time period" id="periods"></div>
+    </div>
+    <div class="stats">
+      <div class="stat"><span>Income</span><b id="sIncome">$0</b></div>
+      <div class="stat"><span>Expenses</span><b id="sSpent">$0</b></div>
+      <div class="stat"><span id="sNetLabel">Saved</span><b id="sNet">$0</b></div>
+    </div>
+    <div class="chart" id="chart"><div class="empty">Your flow chart appears here once you add income and expenses below.</div></div>
+  </section>
+
+  <section class="card" aria-labelledby="formTitle">
+    <h2 id="formTitle">Add an entry</h2>
+    <form id="form" autocomplete="off">
+      <div class="kind"><div class="seg" role="group" aria-label="Entry type">
+        <button type="button" id="kExpense" aria-pressed="true">Expense</button>
+        <button type="button" id="kIncome" aria-pressed="false">Income</button>
+      </div></div>
+      <div class="row">
+        <label>Amount ($)<input id="fAmount" type="number" inputmode="decimal" step="0.01" min="0.01" required placeholder="0.00"></label>
+        <label>Category<select id="fCategory"></select></label>
+      </div>
+      <label id="customWrap" hidden>New category name<input id="fCustom" maxlength="30" placeholder="e.g. Pets"></label>
+      <div class="row">
+        <label>Date<input id="fDate" type="date" required></label>
+        <label>Note (optional)<input id="fNote" maxlength="80" placeholder="e.g. Rent, Costco run"></label>
+      </div>
+      <label class="check"><input type="checkbox" id="fRepeat"> Repeats every month (rent, paycheck, subscriptions)</label>
+      <label id="endWrap" hidden>Last month it applies (leave blank if ongoing)<input id="fEnd" type="month"></label>
+      <div class="btns">
+        <button class="btn primary" type="submit" id="saveBtn">Add expense</button>
+        <button class="btn" type="button" id="cancelBtn" hidden>Cancel</button>
+        <button class="btn danger" type="button" id="deleteBtn" hidden>Delete</button>
+      </div>
+      <div class="status" id="status" role="status"></div>
+    </form>
+  </section>
+
+  <section class="card" aria-labelledby="ledgerTitle">
+    <h2 id="ledgerTitle">Entries</h2>
+    <p class="sub">Tap an entry to edit it. Monthly entries count once in every month they apply.</p>
+    <div class="list" id="list"><div class="empty">No entries yet. Add your first paycheck or bill above.</div></div>
+  </section>
+</div>
+
+<script>
+(() => {
+  const INCOME_CATS = ["Paychecks", "Interest", "Reimbursements", "Side income", "Other income"];
+  const EXPENSE_CATS = ["Household", "Drinks & Dining", "Shopping", "Travel & Vacation", "Auto & Transport", "Entertainment", "Health Care", "Education", "Other"];
+  const CAT_VAR = {
+    "Household": "--c-household", "Drinks & Dining": "--c-dining", "Shopping": "--c-shopping", "Travel & Vacation": "--c-travel",
+    "Auto & Transport": "--c-auto", "Entertainment": "--c-fun", "Health Care": "--c-health", "Education": "--c-edu", "Other": "--c-other",
+  };
+  const INCOME_VARS = ["--c-income", "--c-income2", "--c-income3"];
+  const EXTRA_VARS = ["--c-dining", "--c-fun", "--c-travel", "--c-health", "--c-edu", "--c-shopping"];
+  const PERIODS = [
+    { id: "1", label: "1 mo", months: 1 },
+    { id: "3", label: "3 mo", months: 3 },
+    { id: "6", label: "6 mo", months: 6 },
+    { id: "ytd", label: "YTD" },
+    { id: "12", label: "12 mo", months: 12 },
+  ];
+  const $ = (id) => document.getElementById(id);
+  const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim() || "#999";
+  const money = (n, cents = true) => (n < 0 ? "-" : "") + "$" + Math.abs(n).toLocaleString("en-US", { minimumFractionDigits: cents ? 2 : 0, maximumFractionDigits: cents ? 2 : 0 });
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const ym = (d) => d.slice(0, 7);
+  const today = () => { const t = new Date(); return t.getFullYear() + "-" + String(t.getMonth() + 1).padStart(2, "0") + "-" + String(t.getDate()).padStart(2, "0"); };
+  const addMonths = (ymStr, n) => { let [y, m] = ymStr.split("-").map(Number); m += n; while (m < 1) { m += 12; y--; } while (m > 12) { m -= 12; y++; } return y + "-" + String(m).padStart(2, "0"); };
+  const monthName = (ymStr) => { const [y, m] = ymStr.split("-"); return MONTHS[+m - 1] + " " + y; };
+
+  let entries = [];
+  let period = "6";
+  try { period = localStorage.getItem("mf-period") || "6"; } catch (e) {}
+  let kind = "expense";
+  let editing = null;
+  let db = null, col = null;
+  let confirmDelete = false;
+
+  // ---------- period ----------
+  function range() {
+    const nowYm = ym(today());
+    const p = PERIODS.find((x) => x.id === period) || PERIODS[2];
+    const start = p.id === "ytd" ? nowYm.slice(0, 4) + "-01" : addMonths(nowYm, -(p.months - 1));
+    return { start, end: nowYm, p };
+  }
+  // Expand entries into concrete month occurrences within [start, end]
+  function occurrences(start, end) {
+    const out = [];
+    for (const e of entries) {
+      if (e.repeat === "monthly") {
+        let m = ym(e.date) > start ? ym(e.date) : start;
+        const last = e.end && e.end < end ? e.end : end;
+        for (; m <= last; m = addMonths(m, 1)) out.push({ e, month: m });
+      } else {
+        const m = ym(e.date);
+        if (m >= start && m <= end) out.push({ e, month: m });
+      }
+    }
+    return out;
+  }
+
+  // ---------- chart ----------
+  function render() {
+    const { start, end, p } = range();
+    $("flowTitle").textContent = p.id === "1" ? "This month" : p.id === "ytd" ? "Year to date" : "Last " + p.months + " months";
+    $("rangeLabel").textContent = start === end ? "(" + monthName(start) + ")" : "(" + MONTHS[+start.slice(5) - 1] + " " + start.slice(0, 4) + " – Current)";
+    $("periods").innerHTML = PERIODS.map((x) => `<button type="button" data-p="${x.id}" aria-pressed="${x.id === period}">${x.label}</button>`).join("");
+
+    const occ = occurrences(start, end);
+    const inc = {}, exp = {};
+    for (const { e } of occ) {
+      const bucket = e.kind === "income" ? inc : exp;
+      bucket[e.category] = (bucket[e.category] || 0) + e.amount;
+    }
+    const totalIn = Object.values(inc).reduce((a, b) => a + b, 0);
+    const totalOut = Object.values(exp).reduce((a, b) => a + b, 0);
+    const net = totalIn - totalOut;
+    $("sIncome").textContent = money(totalIn, false);
+    $("sSpent").textContent = money(totalOut, false);
+    $("sNetLabel").textContent = net >= 0 ? "Saved" + (totalIn ? " (" + Math.round((net / totalIn) * 100) + "%)" : "") : "Overspent";
+    $("sNet").textContent = money(Math.abs(net), false);
+    $("sNet").className = net >= 0 ? "pos" : "neg";
+    drawSankey(inc, exp, totalIn, totalOut);
+    renderList(occ, start, end);
+    $("exampleBanner").hidden = !entries.some((e) => e.example);
+  }
+
+  function drawSankey(inc, exp, totalIn, totalOut) {
+    const chart = $("chart");
+    if (totalIn + totalOut === 0) {
+      chart.innerHTML = '<div class="empty">Nothing recorded in this period. Add income and expenses below to see where your money goes.</div>';
+      return;
+    }
+    const sources = Object.entries(inc).sort((a, b) => b[1] - a[1]).map(([name, v], i) => ({ name, v, color: css(INCOME_VARS[Math.min(i, 2)]) }));
+    const deficit = Math.max(0, totalOut - totalIn);
+    if (deficit > 0) sources.push({ name: "From savings", v: deficit, color: css("--c-deficit") });
+    const surplus = Math.max(0, totalIn - totalOut);
+    let extra = 0;
+    const cats = Object.entries(exp).sort((a, b) => b[1] - a[1]).map(([name, v]) => ({ name, v, color: css(CAT_VAR[name] || EXTRA_VARS[extra++ % EXTRA_VARS.length]) }));
+
+    const W = 420, BAR = 7, X0 = 6, X1 = 108, X2 = 196, X3 = 270;
+    const flowTotal = totalIn + deficit; // == max(totalIn, totalOut)
+    const k = 260 / flowTotal;
+    const GAP = 6, SLOT = 30;
+    // right column: savings first, then categories
+    const right = [];
+    if (surplus > 0) right.push({ name: "Savings", v: surplus, color: css("--c-savings"), fromTotal: true });
+    right.push(...cats);
+    const colH = (arr, slot) => arr.reduce((s, n) => s + Math.max(n.v * k, slot), 0) + GAP * Math.max(0, arr.length - 1);
+    const H = Math.max(colH(right, SLOT), colH(sources, SLOT), flowTotal * k) + 24;
+    const place = (arr, slot) => { let y = (H - colH(arr, slot)) / 2; for (const n of arr) { const s = Math.max(n.v * k, slot); n.h = n.v * k; n.y = y + (s - n.h) / 2; n.ly = y + s / 2; y += s + GAP; } };
+    place(sources, SLOT); place(right, SLOT);
+    const total = { name: "Income", v: flowTotal, h: flowTotal * k, color: css("--c-total") };
+    total.y = (H - total.h) / 2;
+    const spent = { name: "Expenses", v: totalOut, h: totalOut * k, color: css("--c-spent") };
+    spent.y = total.y + surplus * k;
+
+    let defs = "", flows = "", nodes = "", gid = 0;
+    const band = (xa, ya, xb, yb, h, ca, cb) => {
+      if (h <= 0) return;
+      const id = "g" + gid++;
+      defs += `<linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="${xa}" x2="${xb}" y1="0" y2="0"><stop offset="0" stop-color="${ca}"/><stop offset="1" stop-color="${cb}"/></linearGradient>`;
+      const xm = (xa + xb) / 2;
+      flows += `<path class="flow" fill="url(#${id})" style="fill-opacity:var(--link-op)" d="M${xa},${ya} C${xm},${ya} ${xm},${yb} ${xb},${yb} L${xb},${yb + h} C${xm},${yb + h} ${xm},${ya + h} ${xa},${ya + h} Z"/>`;
+    };
+    // sources -> total
+    let off = total.y;
+    for (const s of sources) { band(X0 + BAR, s.y, X1, off, s.h, s.color, total.color); off += s.h; }
+    // total -> savings (direct to right column), total -> expenses
+    off = total.y;
+    const sav = right.find((n) => n.fromTotal);
+    if (sav) { band(X1 + BAR, off, X3, sav.y, sav.h, total.color, sav.color); off += sav.h; }
+    band(X1 + BAR, off, X2, spent.y, spent.h, total.color, spent.color);
+    // expenses -> categories
+    off = spent.y;
+    for (const c of cats) { band(X2 + BAR, off, X3, c.y, c.h, spent.color, c.color); off += c.h; }
+
+    const bar = (x, n) => `<rect x="${x}" y="${n.y}" width="${BAR}" height="${Math.max(n.h, 1.5)}" rx="2" fill="${n.color}"><title>${esc(n.name)}: ${money(n.v)}</title></rect>`;
+    const label = (x, y, n) => `<text class="lbl" x="${x}" y="${y - 2}">${esc(n.name)}</text><text class="amt" x="${x}" y="${y + 9}">${money(n.v)}</text>`;
+    for (const s of sources) nodes += `<g class="node">${bar(X0, s)}${label(X0 + BAR + 5, s.ly, s)}</g>`;
+    nodes += `<g class="node">${bar(X1, total)}${label(X1 + BAR + 5, total.y + total.h / 2, total)}</g>`;
+    if (totalOut > 0) nodes += `<g class="node">${bar(X2, spent)}${label(X2 + BAR + 5, spent.y + spent.h / 2, spent)}</g>`;
+    for (const c of right) nodes += `<g class="node">${bar(X3, c)}${label(X3 + BAR + 5, c.ly, c)}</g>`;
+
+    chart.innerHTML = `<svg viewBox="0 0 ${W} ${Math.ceil(H)}" role="img" aria-label="Flow of income into expenses and savings"><defs>${defs}</defs>${flows}${nodes}</svg>`;
+  }
+
+  // ---------- ledger ----------
+  function colorFor(e) {
+    if (e.kind === "income") return css("--c-income");
+    return css(CAT_VAR[e.category] || "--c-other");
+  }
+  function renderList(occ, start, end) {
+    const list = $("list");
+    if (!entries.length) { list.innerHTML = '<div class="empty">No entries yet. Add your first paycheck or bill above.</div>'; return; }
+    const byMonth = {};
+    for (const o of occ) (byMonth[o.month] ||= []).push(o);
+    const months = Object.keys(byMonth).sort().reverse();
+    if (!months.length) { list.innerHTML = '<div class="empty">No entries in this period.</div>'; return; }
+    let html = "";
+    for (const m of months) {
+      const rows = byMonth[m].sort((a, b) => (b.e.repeat === "monthly") - (a.e.repeat === "monthly") || b.e.date.localeCompare(a.e.date));
+      const net = rows.reduce((s, { e }) => s + (e.kind === "income" ? e.amount : -e.amount), 0);
+      html += `<div class="month"><span>${monthName(m)}</span><span class="${net >= 0 ? "pos" : "neg"}">${net >= 0 ? "+" : ""}${money(net, false)}</span></div>`;
+      for (const { e } of rows) {
+        const sign = e.kind === "income" ? "+" : "−";
+        const sub = e.repeat === "monthly" ? "Monthly since " + monthName(ym(e.date)) + (e.end ? " · ends " + monthName(e.end) : "") : new Date(e.date + "T12:00").toLocaleDateString("en-US", { month: "short", day: "numeric" });
+        html += `<button type="button" class="item" data-id="${esc(e.id)}"><span class="dot" style="background:${colorFor(e)}"></span><span class="t"><b>${esc(e.note || e.category)}${e.repeat === "monthly" ? '<span class="pill">monthly</span>' : ""}${e.example ? '<span class="pill">example</span>' : ""}</b><small>${esc(e.category)} · ${sub}</small></span><span class="a ${e.kind === "income" ? "pos" : ""}">${sign}${money(e.amount)}</span></button>`;
+      }
+    }
+    list.innerHTML = html;
+  }
+
+  // ---------- form ----------
+  function setKind(k) {
+    kind = k;
+    $("kExpense").setAttribute("aria-pressed", k === "expense");
+    $("kIncome").setAttribute("aria-pressed", k === "income");
+    fillCategories();
+    $("saveBtn").textContent = editing ? "Save changes" : k === "income" ? "Add income" : "Add expense";
+  }
+  function fillCategories(selected) {
+    const base = kind === "income" ? INCOME_CATS : EXPENSE_CATS;
+    const custom = [...new Set(entries.filter((e) => e.kind === kind).map((e) => e.category))].filter((c) => !base.includes(c));
+    const all = [...base, ...custom];
+    $("fCategory").innerHTML = all.map((c) => `<option${c === selected ? " selected" : ""}>${esc(c)}</option>`).join("") + '<option value="__new">+ New category…</option>';
+    $("customWrap").hidden = true;
+  }
+  function resetForm() {
+    editing = null; confirmDelete = false;
+    $("formTitle").textContent = "Add an entry";
+    $("fAmount").value = ""; $("fNote").value = ""; $("fDate").value = today();
+    $("fRepeat").checked = false; $("fEnd").value = ""; $("endWrap").hidden = true;
+    $("cancelBtn").hidden = true; $("deleteBtn").hidden = true; $("deleteBtn").textContent = "Delete";
+    setKind(kind);
+  }
+  function startEdit(id) {
+    const e = entries.find((x) => x.id === id); if (!e) return;
+    editing = e; confirmDelete = false;
+    kind = e.kind; setKind(e.kind); fillCategories(e.category);
+    $("formTitle").textContent = "Edit entry";
+    $("fAmount").value = e.amount; $("fNote").value = e.note || ""; $("fDate").value = e.date;
+    $("fRepeat").checked = e.repeat === "monthly"; $("endWrap").hidden = e.repeat !== "monthly"; $("fEnd").value = e.end || "";
+    $("cancelBtn").hidden = false; $("deleteBtn").hidden = false; $("deleteBtn").textContent = "Delete";
+    $("saveBtn").textContent = "Save changes";
+    $("status").textContent = e.repeat === "monthly" ? "Tip: if this bill's amount changed, set its last month here, then add a new monthly entry with the new amount." : "";
+    $("form").scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  async function save(ev) {
+    ev.preventDefault();
+    if (!col) { $("status").textContent = "Saving isn't available in this view. Open the page while signed in to claude.ai."; return; }
+    const amount = Math.round(parseFloat($("fAmount").value) * 100) / 100;
+    if (!(amount > 0)) { $("status").textContent = "Enter an amount greater than zero."; return; }
+    let category = $("fCategory").value;
+    if (category === "__new") { category = $("fCustom").value.trim(); if (!category) { $("status").textContent = "Name the new category."; return; } }
+    const repeat = $("fRepeat").checked ? "monthly" : "none";
+    const data = { kind, category, amount, date: $("fDate").value || today(), note: $("fNote").value.trim(), repeat, end: repeat === "monthly" && $("fEnd").value ? $("fEnd").value : null, example: false, updated: Date.now() };
+    $("saveBtn").disabled = true;
+    try {
+      if (editing) { await col.doc(editing.id).set({ ...data, created: editing.created || Date.now() }); $("status").textContent = "Saved."; }
+      else { await col.add({ ...data, created: Date.now() }); $("status").textContent = (kind === "income" ? "Income" : "Expense") + " added."; }
+      resetForm();
+    } catch (err) {
+      $("status").textContent = err && err.code === "invalid_argument" ? "You have view-only access, so this entry wasn't saved." : "Couldn't save. Check your connection and try again.";
+    } finally { $("saveBtn").disabled = false; }
+  }
+
+  async function del() {
+    if (!editing || !col) return;
+    if (!confirmDelete) { confirmDelete = true; $("deleteBtn").textContent = "Tap again to delete"; return; }
+    try { await col.doc(editing.id).delete(); $("status").textContent = "Deleted."; resetForm(); }
+    catch (e) { $("status").textContent = "Couldn't delete. Try again."; }
+  }
+
+  async function clearExamples() {
+    if (!col) return;
+    const btn = $("clearExamples"); btn.disabled = true; btn.textContent = "Clearing…";
+    for (const e of entries.filter((x) => x.example)) { try { await col.doc(e.id).delete(); } catch (err) {} }
+    btn.disabled = false; btn.textContent = "Clear examples";
+  }
+
+  // ---------- events ----------
+  $("periods").addEventListener("click", (e) => { const b = e.target.closest("button[data-p]"); if (!b) return; period = b.dataset.p; try { localStorage.setItem("mf-period", period); } catch (err) {} render(); });
+  $("kExpense").addEventListener("click", () => setKind("expense"));
+  $("kIncome").addEventListener("click", () => setKind("income"));
+  $("fCategory").addEventListener("change", () => { $("customWrap").hidden = $("fCategory").value !== "__new"; if (!$("customWrap").hidden) $("fCustom").focus(); });
+  $("fRepeat").addEventListener("change", () => { $("endWrap").hidden = !$("fRepeat").checked; });
+  $("form").addEventListener("submit", save);
+  $("cancelBtn").addEventListener("click", () => { resetForm(); $("status").textContent = ""; });
+  $("deleteBtn").addEventListener("click", del);
+  $("list").addEventListener("click", (e) => { const b = e.target.closest(".item"); if (b) startEdit(b.dataset.id); });
+  $("clearExamples").addEventListener("click", clearExamples);
+  matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", render);
+  new MutationObserver(render).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+  resetForm();
+  render();
+
+  // ---------- data ----------
+  (async () => {
+    db = window.claude ? await window.claude.use("db") : null;
+    if (!db) { $("status").textContent = "Sign in to claude.ai to save and load your entries."; return; }
+    col = db.collection("entries");
+    col.onSnapshot((snap) => {
+      entries = snap.docs.map((d) => { const x = d.data(); return { id: d.id, ...x, amount: Number(x.amount) || 0 }; }).filter((e) => e.date && e.category && e.kind);
+      if (!editing) fillCategories($("fCategory").value);
+      render();
+    }, () => { $("status").textContent = "Lost connection to your saved entries. Reload the page to reconnect."; });
+  })();
+})();
+</script>
