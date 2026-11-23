@@ -94,7 +94,31 @@ for re-checking the schema if Impact Company's sheet columns change.
 
 ## Deploying
 
-Any Node-capable host works (a small VPS, Render, Railway, etc.). Set the
-same environment variables from `.env.example` there, and make sure the
-process is kept alive (e.g. via `pm2` or the platform's process manager) so
-the background sync keeps running.
+### Option A: Vercel (free, no credit card required)
+
+The app runs equally well as a serverless deployment: each request lazily
+re-syncs the cache if it's older than `SYNC_INTERVAL_MINUTES` instead of
+relying on a background timer (serverless hosts don't keep a process alive
+between requests), so no code changes are needed between hosting styles.
+
+1. Push this repo to GitHub (already done) and sign in to
+   [vercel.com](https://vercel.com) with your GitHub account — no card
+   needed for the free Hobby tier.
+2. **Add New... → Project**, select the repo, and set **Root Directory** to
+   `impact-calendar`.
+3. Under **Environment Variables**, add `SMARTSHEET_API_TOKEN` and
+   `SMARTSHEET_SHEET_ID` (`2675304775870340`).
+4. Deploy. Vercel gives you a URL like
+   `https://impact-company-calendar.vercel.app` — share that with anyone,
+   no Claude account or Smartsheet connector required on their end.
+
+`vercel.json` in this directory already configures the build; no further
+setup is needed.
+
+### Option B: a traditional host (Render, Railway, a VPS, etc.)
+
+These run the app as a normal long-lived process with its background sync
+timer. Set the same environment variables from `.env.example`, build with
+`npm install`, and start with `npm start`. Many of these platforms require
+a credit card even for free/trial tiers — Vercel (above) is the option
+that doesn't.

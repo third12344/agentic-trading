@@ -12,10 +12,17 @@ const SYNC_INTERVAL_MINUTES = Number(process.env.SYNC_INTERVAL_MINUTES || 15);
 const MOCK_MODE = String(process.env.MOCK_MODE).toLowerCase() === 'true';
 
 if (!MOCK_MODE && (!process.env.SMARTSHEET_API_TOKEN || !process.env.SMARTSHEET_SHEET_ID)) {
-  console.error(
-    'Missing SMARTSHEET_API_TOKEN or SMARTSHEET_SHEET_ID. Set MOCK_MODE=true to run with sample data instead.'
-  );
-  process.exit(1);
+  const message =
+    'Missing SMARTSHEET_API_TOKEN or SMARTSHEET_SHEET_ID. Set MOCK_MODE=true to run with sample data instead.';
+  if (require.main === module) {
+    // Running as a long-lived process (Render, local): fail fast at startup.
+    console.error(message);
+    process.exit(1);
+  }
+  // Running as an imported serverless function (e.g. Vercel): exiting the
+  // process isn't appropriate here, so just warn -- requests will fail
+  // until the env vars are set.
+  console.error(message);
 }
 
 const smartsheetClient = MOCK_MODE
@@ -40,11 +47,29 @@ function parseListParam(value) {
     .filter(Boolean);
 }
 
-app.get('/api/meta', (req, res) => {
+// On a long-lived host the background timer in start() keeps this fresh.
+// On a serverless host (no timer survives between invocations) this lazy
+// check re-syncs on request instead, so both deployment styles work from
+// the same codebase.
+async function ensureFresh() {
+  const staleMs = Math.max(1, SYNC_INTERVAL_MINUTES) * 60 * 1000;
+  const age = store.lastSynced ? Date.now() - new Date(store.lastSynced).getTime() : Infinity;
+  if (age > staleMs) {
+    try {
+      await store.sync();
+    } catch (err) {
+      console.error('Lazy sync failed:', err.message);
+    }
+  }
+}
+
+app.get('/api/meta', async (req, res) => {
+  await ensureFresh();
   res.json(store.getMeta());
 });
 
-app.get('/api/jobs', (req, res) => {
+app.get('/api/jobs', async (req, res) => {
+  await ensureFresh();
   const year = Number(req.query.year);
   const month = Number(req.query.month);
   if (!year || !month) {
@@ -59,7 +84,8 @@ app.get('/api/jobs', (req, res) => {
   res.json({ jobs });
 });
 
-app.get('/api/unassigned', (req, res) => {
+app.get('/api/unassigned', async (req, res) => {
+  await ensureFresh();
   const jobs = store.getUnassigned({
     technicians: parseListParam(req.query.technicians),
     projectTypes: parseListParam(req.query.projectTypes),
@@ -100,4 +126,13 @@ async function start() {
   });
 }
 
-start();
+if (require.main === module) {
+  // Running directly (Render, local, any traditional Node host): keep a
+  // long-lived process with a background sync timer.
+  start();
+}
+
+// Running as an imported serverless function (e.g. Vercel): no background
+// timer survives between invocations, so freshness is instead handled by
+// ensureFresh() on each request above.
+module.exports = app;
