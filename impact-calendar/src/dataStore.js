@@ -1,6 +1,23 @@
 const { buildColumnIndex, EXCLUDED_STATUSES } = require('./columnMapping');
 const { buildMockRows } = require('./mockData');
 
+// The Smartsheet SDK doesn't always reject with a plain Error -- for some
+// failures (e.g. an unauthenticated request with no token at all) it's a
+// bare object with no .message, which left this falling back to the
+// useless default `String(err)` -> "[object Object]". Try several known
+// shapes before giving up.
+function describeSyncError(err) {
+  if (!err) return 'Unknown error';
+  if (typeof err === 'string') return err;
+  if (err.message) return err.message;
+  if (err.statusCode) return `Smartsheet request failed (HTTP ${err.statusCode})`;
+  try {
+    return JSON.stringify(err);
+  } catch {
+    return String(err);
+  }
+}
+
 function cellText(row, columnId) {
   if (columnId === undefined) return '';
   const cell = row.cells.find((c) => c.columnId === columnId);
@@ -96,7 +113,7 @@ class DataStore {
       this.lastSynced = new Date().toISOString();
       this.lastError = null;
     } catch (err) {
-      this.lastError = err.message || String(err);
+      this.lastError = describeSyncError(err);
       throw err;
     }
     return this.rows.length;
